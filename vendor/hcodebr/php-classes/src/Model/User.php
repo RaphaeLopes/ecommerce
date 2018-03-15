@@ -5,7 +5,7 @@ namespace Hcode\Model;
 use \Hcode\DB\Sql;
 use \Hcode\Model;
 
-class User extends model{
+class User extends Model{
 
 	const SESSION = "User";
 
@@ -66,18 +66,53 @@ class User extends model{
 		return $sql->select("SELECT * FROM tb_users a INNER JOIN tb_persons b using(idperson) ORDER BY b.desperson");
 	}
 
-	public static function getUser($iduser)
+	public function Save()
 	{
 		$sql = new Sql();
 
-		return $sql->select("SELECT * FROM tb_users a INNER JOIN tb_persons b using(idperson) ORDER BY b.desperson WHERE iduser = :IDUSER", array("IDUSER" => $iduser));
+		$results = $sql->select("CALL sp_users_save(:desperson, :deslogin, :despassword, :desemail, :nrphone, :inadmin)", array(
+			":desperson"=>$this->getdesperson(), 
+			":deslogin"=>$this->getdeslogin(),
+			":despassword"=>$this->getdespassword(),
+			":desemail"=>$this->getdesemail(),
+			":nrphone"=>$this->getnrphone(),
+			":inadmin"=>$this->getinadmin(),
+			));
+
+		$this->setData($results[0]);
 	}
 
-	public static function Delete()
+	public function get($iduser)
 	{
 		$sql = new Sql();
 
-		$sql->select("DELETE FROM tb_users  WHERE iduser = :IDUSER", array("IDUSER" => $iduser));
+		$results = $sql->select("SELECT * FROM tb_users a INNER JOIN tb_persons b using(idperson) WHERE a.iduser = :IDUSER", array("IDUSER" => $iduser));
+
+		$this->setData($results[0]);
+	}
+
+	public function Update()
+	{
+		$sql = new Sql();
+
+		$results = $sql->select("CALL sp_usersupdate_save(:iduser, :desperson, :deslogin, :despassword, :desemail, :nrphone, :inadmin)", array(
+			":iduser"=>$this->getiduser(), 
+			":desperson"=>$this->getdesperson(), 
+			":deslogin"=>$this->getdeslogin(),
+			":despassword"=>$this->getdespassword(),
+			":desemail"=>$this->getdesemail(),
+			":nrphone"=>$this->getnrphone(),
+			":inadmin"=>$this->getinadmin(),
+			));
+
+		$this->setData($results[0]);
+	}
+
+	public function Delete()
+	{
+		$sql = new Sql();
+		$sql->select("CALL sp_users_delete(:iduser)", array(
+			":iduser"=>$this->getiduser()));
 	}
 }
 
