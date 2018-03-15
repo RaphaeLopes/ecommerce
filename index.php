@@ -1,6 +1,7 @@
 <?php 
 
 session_start();
+
 require_once("vendor/autoload.php");
 
 use \Slim\Slim;
@@ -12,25 +13,24 @@ $app = new Slim();
 
 $app->config('debug', true);
 
-$app->get('/', function() {
-    
+$app->get('/', function() 
+{
 	$page = new Page();
 	$page->setTpl("index");
-
 });
 
-
-$app->get('/admin', function() {
-
+$app->get('/admin', function() 
+{
+	$user = new \Hcode\Model\User();
+	var_dump($user);
 	User::verifyLogin();
 
 	$page = new PageAdmin();
 	$page->setTpl("index");
-
 });
 
-$app->get('/admin/login', function() {
-    
+$app->get('/admin/login', function() 
+{
 	$page = new PageAdmin([
 		"header"=> false, 
 		"footer"=> false
@@ -39,15 +39,13 @@ $app->get('/admin/login', function() {
 	$page->setTpl("login");
 });
 
-$app->post('/admin/login', function() {
+$app->post('/admin/login', function() 
+{
     
-    $login = $_POST["login"];
-    $password = $_POST["password"];
-	User::login($login, $password);
+    User::login($_POST["login"], $_POST["password"]);
 
 	header("Location: /admin");
 	exit;
-
 });
 
 $app->get('/admin/logout', function() {
@@ -55,6 +53,55 @@ $app->get('/admin/logout', function() {
 	User::logout();
 	header("Location: /admin/login");
 	exit;
+});
+
+
+$app->get('/admin/users', function(){
+
+	User::verifyLogin();
+
+	$users = User::listAll();
+	$page = new PageAdmin();
+
+	$page->setTpl("users", array("users"=> $users));
+});
+
+$app->get('/admin/users/create', function(){
+
+	User::verifyLogin();
+	
+	$page = new PageAdmin();
+	$page->setTpl("users-create");
+});
+
+$app->get('/admin/users/:iduser', function($iduser){
+
+	User::verifyLogin();
+	$user = User::getUser($iduser);
+	$page = new PageAdmin();
+
+	$page->setTpl("users-update", array("user"=> $user));
+});
+
+$app->post('/admin/users/create', function()
+{
+
+	User::verifyLogin();
+	
+});
+
+$app->post('/admin/users/:iduser', function($iduser)
+{
+	User::verifyLogin();
+	
+});
+
+$app->delete('/admin/users/:iduser', function($iduser)
+{
+
+	User::verifyLogin();
+	User::Delete($iduser);
+	
 });
 
 $app->run();

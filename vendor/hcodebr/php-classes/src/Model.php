@@ -2,7 +2,7 @@
 
 namespace Hcode;
 
-class Model{
+class Model {
 
 	private $values = [];
 
@@ -22,14 +22,17 @@ class Model{
 		}
 	}
 
-	public function setData($data = array()){
+	public function setData($data = array())
+	{
 
-		foreach ($data as $key => $value) {
+		foreach ($data as $key => $value) 
+		{
 			$this->{"set".$key}($value);
 		}
 	}
 
-	public function getValues(){
+	public function getValues()
+	{
 		return $this->values;
 	}
 }
